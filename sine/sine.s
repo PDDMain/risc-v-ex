@@ -3,15 +3,23 @@
 .section .data
 var:
 .align	8
-.space 204
+.space 104
 
 var2:
 .align 8
-.space 204
+.space 104
+
+var3:
+.align 8
+.space 104
+
+var4:
+.align 8
+.space 104
 
 mult:
 .align 8
-.space 404
+.space 204
 
 
 .section .text
@@ -113,29 +121,40 @@ end_read:
 
 
 # CALCULATIONS
-	la	a3, var
-	la	a4, var
-	la	a5, var2
 	mv	t0, ra
-	call	sum
-	
-	ld	a7, 0(a5)
-	la	a3, var
-	call	clear
 
-	la	a3, var2
+	la	a3, var
 	la	a4, var2
+	call	copy
+
 	la	a5, var
 	call	mult_double
+
+	li	a6, 5
+	call	fact
+
+	la	a3, var
+	mv	a4, a7
+	
 	mv	ra, t0
 
 
 
 # WRITE FROM VAR TO OUTPUT
-	mv	a4, a2
 	la	a5, var
-	li	a6, 0
+	lb	s4, 0(a5)
+	ori	s4, s4, 0x30
+	sb	s4, 0(a2)
+	li	s4, '.'
+	sb	s4, 1(a2)
+
+	mv	a4, a2
+	addi	a4, a4, 2
+	addi	a5, a5, 1
+	li	a6, 2
 	li	a7, 100
+
+
 # for ()
 loop3:
 	beq	a6, a7, end_loop3
@@ -317,4 +336,48 @@ sb	s2, 0(s4)
 addi	s1, s1, 1
 bne	s1, s3, clear_loop
 ret
+
+# a3 - from
+# a4 - to
+copy:
+li	s1, 0
+li	s2, 100
+copy_loop:
+add	s4, a3, s1
+lb	s3, 0(s4)
+add	s4, a4, s1
+sb	s3, 0(s4)
+addi	s1, s1, 1
+bne	s1, s2, copy_loop
+ret
+
+# a6 - number
+# a7 - result (factorial)
+fact:
+li	a7, 1
+mv	s1, a6
+fact_loop:
+beqz	s1, end_fact
+#mult	a7, a7, s1
+mv	s2, s1
+li	s3, 0
+fact_mult:
+beqz	s2, end_fact_mult
+add	s3, s3, a7
+addi	s2, s2, -1
+j	fact_mult
+end_fact_mult:
+mv	a7, s3
+addi	s1, s1, -1
+j	fact_loop
+
+end_fact:
+ret
+
+# a3 - address of double number for divide
+# a4 - number
+div:
+
+
+
 
