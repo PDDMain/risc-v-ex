@@ -3,23 +3,23 @@
 .section .data
 var:
 .align	8
-.space 104
+.space 204
 
 var2:
 .align 8
-.space 104
+.space 204
 
 var3:
 .align 8
-.space 104
+.space 204
 
 var4:
 .align 8
-.space 104
+.space 204
 
 mult:
 .align 8
-.space 204
+.space 404
 
 
 .section .text
@@ -121,22 +121,105 @@ end_read:
 
 
 # CALCULATIONS
-	mv	t0, ra
+	mv	t6, ra
+
+	#la	a3, var
+	#la	a4, var2
+	#call	copy
+
+	#la	a5, var
+	#call	mult_double
+
+	#li	a6, 5
+	#call	fact
+
+	#la	a3, var
+	
+	#la	a4, var2
+	#call	copy
+
+	#la	a3, var2
+	#mv	a4, a7
+	#la	a5, var
+	#call	div
+
+#-----------------
+
+	#la	a3, var
+	#li	a4, 120
+	#la	a5, var
+	#call	div
+	#j	end_mmm
+
 
 	la	a3, var
 	la	a4, var2
 	call	copy
 
-	la	a5, var
-	call	mult_double
-
-	li	a6, 5
-	call	fact
-
-	la	a3, var
-	mv	a4, a7
+	li	t0, 3
+	li	t1, 11
 	
-	mv	ra, t0
+	mmm:
+		beq 	t0, t1, end_mmm
+		# part 1
+		addi	a6, t0, 2
+		call	fact
+
+		la	a3, var2
+		mv	a4, a7
+		la	a5, var3
+		call	div
+		
+		la	a4, var3
+		addi	t2, t0, 1
+
+		m1:
+			beqz	t2, end_m1
+			call	mult_double
+
+			addi	t2, t2, -1
+			j	m1
+		end_m1:
+
+
+		la	a3, var
+		la	a4, var3
+		la	a5, var
+		call sum
+		# part 2
+		mv	a6, t0
+		call	fact
+
+		la	a4, var2
+		mv	a4, a7
+		la	a5, var3
+		call	div
+		
+		la	a4, var3
+		addi	t2, t0, -1
+		m2:
+			beqz	t2, end_m2
+			call	mult_double
+
+			addi	t2, t2, -1
+			j	m2
+		end_m2:
+
+		la	a3, var
+		la	a4, var3
+		la	a5, var
+		#call	subtr
+
+
+		addi	t0, t0, 8
+		j	mmm
+	end_mmm:
+	
+	
+
+#-----------------
+
+	mv	ra, t6
 
 
 
@@ -224,6 +307,35 @@ skip_step_sum:
 
 	ret
 
+# a3 - a4 = a5
+subtr:
+	li	s5, 100
+	li	s4, 0
+	li	s9, 10
+	li	s10, 0
+loop_sub:
+	addi	s5, s5, -1
+	
+	add	s6, a3, s5
+	lb	s1, 0(s6)
+
+	sub	s6, a4, s5
+	lb	s2, 0(s6)
+
+	sub	s3, s1, s2
+	sub	s3, s3, s4
+	li	s4, 0
+
+	bgez	s3, skip_sub
+		addi	s3, s3, 10
+		li	s4, 1
+skip_sub:
+	add	s6, a5, s5
+	sb	s3, 0(s6)
+
+	bnez	s5, loop_sub
+ret
+
 
 # a3 - var1
 # a4 - var2
@@ -254,14 +366,14 @@ mult_double:
 
 	li	s11, 0
 	la	a6, mult
-	li	s1, 100
+	li	s1, 11
 	li	s5, 0
 	li	s10, 10
 loop_mult1:
 	addi	s1, s1, -1
 	add	s7, a4, s1
 	lb	s2, 0(s7)
-	li	s8, 100
+	li	s8, 11
 
 	li	a7, 0
 	loop_mult2:
@@ -376,8 +488,39 @@ ret
 
 # a3 - address of double number for divide
 # a4 - number
+# a5 - result
 div:
+li	s1, 0 # index
+li	s2, 0 # part
+li	s8, 100
+loop_div:
+	add	s3, a3, s1
+	lb	s4, 0(s3)
+	li	s5, 0
+	li	s6, 10
+	s_div:
+		beqz	s6, end_s
+		add	s5, s5, s2
+		addi	s6, s6, -1
+		j	s_div
+	end_s:
+	add	s2, s5, s4
+	
+	li	s7, 0
+	bge	s2, a4, n1_div
+		j	n2_div
+	n1_div:
+		m_loop:
+			blt	s2, a4, n2_div	
+			sub	s2, s2, a4
+			addi	s7, s7, 1
+			j	m_loop
+	n2_div:
+	
+	add	s3, a5, s1
+	sb	s7, 0(s3)
 
-
-
+	addi	s1, s1, 1
+	bne	s1, s8, loop_div
+ret
 
