@@ -17,6 +17,10 @@ var4:
 .align 8
 .space 104
 
+var5:
+.align 8
+.space 104
+
 mult:
 .align 8
 .space 204
@@ -166,69 +170,68 @@ end_read:
 	la	a4, var2
 	call	copy
 
+	la	a4, var3
+	call	copy
+
+#	la	a3, var2
+#	li	a4, 2
+#	la	a5, var
+#	call	div
+#	j	end_mm
+
+
 	li	t0, 3
-	li	t1, 19
-	
-	mmm:
-		beq 	t0, t1, end_mmm
-		# part 1
-		addi	a6, t0, 2
-		call	fact
-
-		la	a3, var2
-		mv	a4, a7
-		la	a5, var3
+	li	t1, 87
+	mm:
+		beq	t0, t1, end_mm
+		
+		la	a3, var3
+		addi	a4, t0, -1
+		la	a5, var4
 		call	div
 		
-		la	a4, var3
-		addi	t2, t0, 1
-		m1:
-			beqz	t2, end_m1
-			call	clear_mult
-
-			call	mult_double
-			
-			addi	t2, t2, -1
-			j	m1
-		end_m1:
-	
-		la	a3, var
-		la	a4, var3
-		la	a5, var
-		call sum
-
-		# part 2
-		mv	a6, t0
-		call	fact
-
-		la	a3, var2
-		mv	a4, a7
-		la	a5, var3
+		la	a3, var4
+		mv	a4, t0
+		la	a5, var5
 		call	div
 		
-		la	a4, var3
-		addi	t2, t0, -1
-		m2:
-			beqz	t2, end_m2
-			call	clear_mult
-			
-			call	mult_double
+		la	a3, var5
+		la	a4, var2
+		la	a5, var5
+		call	clear_mult
+		call	mult_double
+		call	clear_mult
+		call	mult_double
 
-			addi	t2, t2, -1
-			j	m2
-		end_m2:
+		la	a3, var5
+		addi	a4, t0, 1
+		la	a5, var4
+		call	div
+
+		la	a3, var4
+		addi	a4, t0, 2
+		la	a5, var3
+		call	div
+
+		la	a3, var3
+		la	a4, var2
+		la	a3, var3
+		call	clear_mult
+		call	mult_double
+		call	clear_mult
+		call	mult_double
 
 		la	a3, var
 		la	a4, var3
 		la	a5, var
+		call	sum
+
+		la	a4, var5
 		call	subtr
 
-
 		addi	t0, t0, 4
-		j	mmm
-	end_mmm:
-	
-	
+		j	mm	
+	end_mm:
 
 #-----------------
 
