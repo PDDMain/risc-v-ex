@@ -3,23 +3,23 @@
 .section .data
 var:
 .align	8
-.space 204
+.space 104
 
 var2:
 .align 8
-.space 204
+.space 104
 
 var3:
 .align 8
-.space 204
+.space 104
 
 var4:
 .align 8
-.space 204
+.space 104
 
 mult:
 .align 8
-.space 404
+.space 204
 
 
 .section .text
@@ -145,6 +145,23 @@ end_read:
 
 #-----------------
 
+#	la	a4, var2
+#	li	s1, 1
+#	sb	s1, 0(a4)
+#	li	s1, 5
+#	sb	s1, 1(a4)
+#	li	s1, 6
+#	sb	s1, 2(a4)
+#	sb	s1, 3(a4)
+#	la	a4, var
+#	la	a3, var2
+#	la	a5, var3
+#	call	mult_double
+	
+#	la	a3, var3
+#	call	copy
+#	j	end_mmm
+
 	la	a3, var
 	la	a4, var2
 	call	copy
@@ -165,18 +182,16 @@ end_read:
 		
 		la	a4, var3
 		addi	t2, t0, 1
-
 		m1:
 			beqz	t2, end_m1
 			call	clear_mult
 
 			call	mult_double
-
+			
 			addi	t2, t2, -1
 			j	m1
 		end_m1:
-
-
+	
 		la	a3, var
 		la	a4, var3
 		la	a5, var
@@ -412,7 +427,9 @@ loop_mult1:
 
 		sb	s9, 0(s7)
 	
-	bne	s8, s11, loop_mult2
+	bnez	s8, loop_mult2
+	add	a7, a7, s5
+	li	s5, 0
 	beqz	a7, skip1
 		add	s7, a6, s8
 		addi	s7, s7, -1
@@ -420,7 +437,7 @@ loop_mult1:
 		sb	a7, 0(s7)
 	skip1:
 
-bne	s1, s11, loop_mult1	
+bnez	s1, loop_mult1	
 
 li	s1, 0
 li	s2, 100
@@ -451,7 +468,7 @@ ret
 clear_mult:
 li	s1, 0
 li	s2, 0
-li	s3, 200
+li	s3, 202
 la	s5, mult
 clear_loop_m:
 add	s4, s5, s1
