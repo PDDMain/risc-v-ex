@@ -145,19 +145,12 @@ end_read:
 
 #-----------------
 
-	#la	a3, var
-	#li	a4, 120
-	#la	a5, var
-	#call	div
-	#j	end_mmm
-
-
 	la	a3, var
 	la	a4, var2
 	call	copy
 
 	li	t0, 3
-	li	t1, 11
+	li	t1, 19
 	
 	mmm:
 		beq 	t0, t1, end_mmm
@@ -175,6 +168,8 @@ end_read:
 
 		m1:
 			beqz	t2, end_m1
+			call	clear_mult
+
 			call	mult_double
 
 			addi	t2, t2, -1
@@ -186,11 +181,12 @@ end_read:
 		la	a4, var3
 		la	a5, var
 		call sum
+
 		# part 2
 		mv	a6, t0
 		call	fact
 
-		la	a4, var2
+		la	a3, var2
 		mv	a4, a7
 		la	a5, var3
 		call	div
@@ -199,6 +195,8 @@ end_read:
 		addi	t2, t0, -1
 		m2:
 			beqz	t2, end_m2
+			call	clear_mult
+			
 			call	mult_double
 
 			addi	t2, t2, -1
@@ -208,10 +206,10 @@ end_read:
 		la	a3, var
 		la	a4, var3
 		la	a5, var
-		#call	subtr
+		call	subtr
 
 
-		addi	t0, t0, 8
+		addi	t0, t0, 4
 		j	mmm
 	end_mmm:
 	
@@ -319,7 +317,7 @@ loop_sub:
 	add	s6, a3, s5
 	lb	s1, 0(s6)
 
-	sub	s6, a4, s5
+	add	s6, a4, s5
 	lb	s2, 0(s6)
 
 	sub	s3, s1, s2
@@ -366,14 +364,14 @@ mult_double:
 
 	li	s11, 0
 	la	a6, mult
-	li	s1, 11
+	li	s1, 100
 	li	s5, 0
 	li	s10, 10
 loop_mult1:
 	addi	s1, s1, -1
 	add	s7, a4, s1
 	lb	s2, 0(s7)
-	li	s8, 11
+	li	s8, 100
 
 	li	a7, 0
 	loop_mult2:
@@ -447,6 +445,19 @@ add	s4, a3, s1
 sb	s2, 0(s4)
 addi	s1, s1, 1
 bne	s1, s3, clear_loop
+ret
+
+
+clear_mult:
+li	s1, 0
+li	s2, 0
+li	s3, 200
+la	s5, mult
+clear_loop_m:
+add	s4, s5, s1
+sb	s2, 0(s4)
+addi	s1, s1, 1
+bne	s1, s3, clear_loop_m
 ret
 
 # a3 - from
